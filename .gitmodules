@@ -1,3 +1,3 @@
 [submodule "ai8x-training"]
-	path = ai8x-training
+	path = ai8x_training
 	url = git@github.com:MaximIntegratedAI/ai8x-training.git
