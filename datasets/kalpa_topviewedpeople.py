@@ -12,6 +12,10 @@ from pathlib import Path
 from torch.utils.data import Dataset
 
 enabled_classes = ('negative', 'person',)
+class_to_label = {
+    k: i
+    for i, k in enumerate(enabled_classes)
+}
 
 class TopViewedPeople(Dataset):
 
@@ -40,22 +44,21 @@ class TopViewedPeople(Dataset):
             lbl = "person"
             if lbl in enabled_classes:
                 images.append(img_path)
-                labels.append(1)
+                labels.append(class_to_label[lbl])
 
         img_folder = 'train' if self.train else 'test'
         for img_path in (Path(data_dir) / img_folder).glob('*.jpg'):
-            # lbl = img_path.parent.name
             lbl = "person"
             if lbl in enabled_classes:
-                    images.append(img_path)
-                    labels.append(1)
+                images.append(img_path)
+                labels.append(class_to_label[lbl])
 
         img_folder = 'train_subset_negatives' if self.train else 'test_negatives'
         for img_path in (Path(data_dir) / img_folder).glob('*.png'):
             lbl = "negative"
             if lbl in enabled_classes:
-                    images.append(img_path)
-                    labels.append(0)
+                images.append(img_path)
+                labels.append(class_to_label[lbl])
 
         data = {'images': images, 'labels': labels}
 
@@ -107,9 +110,8 @@ def top_viewed_people_get_datasets(data, load_train=True, load_test=True):
         ]),
         'train': transforms.Compose([
              transforms.RandomCrop(32),
-             transforms.RandomAffine(degrees=10, translate=None, scale=(0.8, 1.2)),
-             transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.1, hue=0.03),
-             transforms.GaussianBlur(kernel_size=(3,3), sigma=(0.1, 5)),
+             transforms.RandomAffine(degrees=10, translate=None, scale=None),
+             transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.1, hue=0.02),
              transforms.RandomHorizontalFlip(),
              transforms.RandomVerticalFlip(),
              transforms.ToTensor(),
@@ -123,10 +125,10 @@ def top_viewed_people_get_datasets(data, load_train=True, load_test=True):
     }
     
     if load_train:
-        train_dataset = TopViewedPeople(data_dir, train=True, transform=data_transforms)
+        train_dataset = TopViewedPeople(data_dir + '/kalpa', train=True, transform=data_transforms)
     
     if load_test:
-        test_dataset = TopViewedPeople(data_dir, train=False, transform=data_transforms)
+        test_dataset = TopViewedPeople(data_dir + '/kalpa', train=False, transform=data_transforms)
         
         if args.truncate_testset:
             test_dataset.data = test_dataset.data[:1]
