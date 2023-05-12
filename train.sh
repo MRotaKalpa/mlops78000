@@ -2,7 +2,7 @@
 
 SCRIPT_PATH=$(dirname "$(realpath "$0")")
 KALPA_PATH=$SCRIPT_PATH
-TRAINING_PATH=$SCRIPT_PATH/ai8x-training
+TRAINING_PATH=$SCRIPT_PATH/ai8x_training
 DATASET_NAME=top_viewed_people
 
 # Sync user data and datasets
