@@ -3,4 +3,4 @@
 ['remote "origin"']
     url = https://dagshub.com/MRotaKalpa/mlops78000.dvc`
 ['remote "s3remote"']
-    url = s3://mlops-dvc-remote/dvc_remote
+    url = s3://mlops-remote-storage/dvc_remote
