@@ -1,6 +1,6 @@
 [core]
-    remote = newremote
+    remote = s3remote
 ['remote "origin"']
     url = https://dagshub.com/MRotaKalpa/mlops78000.dvc`
-['remote "newremote"']
-    url = ssh://mrota@172.16.0.2:22/home/mrota/mlops/platform/dvc_remote
+['remote "s3remote"']
+    url = s3://mlops-dvc-remote/dvc_remote
