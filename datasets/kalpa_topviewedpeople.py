@@ -17,6 +17,9 @@ class_to_label = {
     for i, k in enumerate(enabled_classes)
 }
 
+CIFAR_LEN = 16
+OTHER_LEN = 16
+
 class TopViewedPeople(Dataset):
 
     def __init__(self, data_dir, train=True, transform=None):
@@ -39,43 +42,42 @@ class TopViewedPeople(Dataset):
         images = []
         labels = []
 
-        img_folder = 'train_subset_canteen' if self.train else 'test_canteen'
-        for img_path in (Path(data_dir) / img_folder).glob('*.png'):
-            lbl = "person"
-            if lbl in enabled_classes:
-                images.append(img_path)
-                labels.append(class_to_label[lbl])
+        def append(folder: str, ext: str, label: str):
+            for i, img_path in enumerate((Path(data_dir) / img_folder).glob(f'*.{ext}')):
+                if lbl in enabled_classes:
+                    images.append(img_path)
+                    labels.append(class_to_label[lbl])
+                if i >= OTHER_LEN:
+                    break
 
         img_folder = 'train' if self.train else 'test'
-        for img_path in (Path(data_dir) / img_folder).glob('*.jpg'):
-            lbl = "person"
-            if lbl in enabled_classes:
-                images.append(img_path)
-                labels.append(class_to_label[lbl])
+        lbl = 'person'
+        append(img_folder, 'jpg', lbl)
+
+        img_folder = 'train_subset_canteen' if self.train else 'test_canteen'
+        lbl = 'person'
+        append(img_folder, 'png', lbl)
 
         img_folder = 'train_subset_negatives' if self.train else 'test_negatives'
-        for img_path in (Path(data_dir) / img_folder).glob('*.png'):
-            lbl = "negative"
-            if lbl in enabled_classes:
-                images.append(img_path)
-                labels.append(class_to_label[lbl])
+        lbl = 'negative'
+        append(img_folder, 'png', lbl)
 
         data = {'images': images, 'labels': labels}
 
         self.img_data = pd.DataFrame(data)
 
     def __len__(self):
-        return len(self.cifar_dataset) + len(self.img_data)
+        return CIFAR_LEN + len(self.img_data)
 
     def __getitem__(self, index):
         if index < 0:
             index += len(self)
 
-        if 0 <= index < len(self.cifar_dataset):
+        if 0 <= index < CIFAR_LEN:
             return self.cifar_dataset[index]
 
         # shift due to the concatenation with cifar10
-        index = index - len(self.cifar_dataset)
+        index = index - CIFAR_LEN
         img_name = os.path.join(self.img_data.loc[index, 'images'])
 
         image = Image.open(img_name)
